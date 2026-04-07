@@ -11,6 +11,7 @@ const CELL_SIZE = canvas.width / GRID_SIZE;
 // ================== ELEMENTS ==================
 const scoreEl = document.getElementById("score");
 const highScoreEl = document.getElementById("highScore");
+const finalScoreEl = document.getElementById("finalScore");
 
 const overlay = document.getElementById("overlay");
 const overlayText = document.getElementById("overlayText");
@@ -63,6 +64,8 @@ function update() {
 
     if (isCollision(head)) {
         state.isGameOver = true;
+
+        const prevHigh = Number(localStorage.getItem("snakeHighScore")) || 0;
         updateHighScore();
         showOverlay("Game Over", "gameover");
         return;
@@ -147,28 +150,63 @@ document.addEventListener("keydown", (e) => {
 });
 
 // ================== OVERLAY CONTROL ==================
-function showOverlay(text, type) {
+// ================== OVERLAY ==================
+function showOverlay(text, type, prevHigh = 0) {
     overlay.classList.remove("hidden");
-    overlayText.innerText = text;
 
-    // Hide all first
+    // reset UI
     startBtn.classList.add("hidden");
     resumeBtn.classList.add("hidden");
     overlayRestart.classList.add("hidden");
+    finalScoreEl.classList.add("hidden");
 
     if (type === "start") {
+        overlayText.innerText = "Snake Game";
         startBtn.classList.remove("hidden");
     }
 
     if (type === "pause") {
+        overlayText.innerText = "Paused";
         resumeBtn.classList.remove("hidden");
         overlayRestart.classList.remove("hidden");
     }
 
     if (type === "gameover") {
+        overlayText.innerText = "Game Over";
+
+        // ✅ Correct comparison
+        if (state.score > prevHigh) {
+            finalScoreEl.innerText = "🎉 New High Score! " + state.score;
+        } else {
+            finalScoreEl.innerText = "Your Score: " + state.score;
+        }
+
+        finalScoreEl.classList.remove("hidden");
         overlayRestart.classList.remove("hidden");
     }
 }
+// function showOverlay(text, type) {
+//     overlay.classList.remove("hidden");
+//     overlayText.innerText = text;
+
+//     // Hide all first
+//     startBtn.classList.add("hidden");
+//     resumeBtn.classList.add("hidden");
+//     overlayRestart.classList.add("hidden");
+
+//     if (type === "start") {
+//         startBtn.classList.remove("hidden");
+//     }
+
+//     if (type === "pause") {
+//         resumeBtn.classList.remove("hidden");
+//         overlayRestart.classList.remove("hidden");
+//     }
+
+//     if (type === "gameover") {
+//         overlayRestart.classList.remove("hidden");
+//     }
+// }
 
 function hideOverlay() {
     overlay.classList.add("hidden");
